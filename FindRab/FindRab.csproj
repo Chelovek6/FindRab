@@ -7,14 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <Compile Remove="ViewModels\Shared\**" />
+    <Content Remove="ViewModels\Shared\**" />
+    <EmbeddedResource Remove="ViewModels\Shared\**" />
+    <None Remove="ViewModels\Shared\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="ViewModels\Shared\" />
-    <Folder Include="Views\" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

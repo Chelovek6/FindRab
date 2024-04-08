@@ -1,0 +1,16 @@
+﻿﻿model FindRab.Models.SecurityModel
+<p><a asp-action="Registration">Регистрация</a></p>
+<h2>Авторизация</h2>
+<form asp-action="autorization" asp-controller="home">
+    <p>
+        <label asp-for="Log_in">Логин</label><br />
+        <input type="text" asp-for="Log_in" />
+    </p>
+    <p>
+        <label asp-for="Pass_word">Пароль</label><br />
+        <input type="text" asp-for="Pass_word" />
+    </p>
+    <p>
+        <input type="submit" value="Отправить" />
+    </p>
+</form>
