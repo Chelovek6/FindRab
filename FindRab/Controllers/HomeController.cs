@@ -13,21 +13,27 @@ namespace FindRab.Controllers
         {
             db = context;
         }
+
+        [HttpGet]
         public IActionResult Autorization()
         {
             return View();
         }
-        [HttpPost]
 
+        [HttpPost]
         public IActionResult Reg(string userName, string userPas)
         {
 
             return new JsonResult(userName, userPas);
         }
+
+        [HttpGet]
         public IActionResult Reg()
         {
             return View();
         }
+
+        [HttpPost]
         public IActionResult Autorization(SecurityModel auto)
         {
             auto.Pass_word = auto.Code(auto.Log_in + auto.Pass_word);
