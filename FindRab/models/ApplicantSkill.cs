@@ -6,7 +6,9 @@ namespace FindRab.models
     [Table("applicant_skills")]
     public class ApplicantSkill
     {
+
         [ForeignKey("Applicant")]
+        [Key] 
         public int ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
 

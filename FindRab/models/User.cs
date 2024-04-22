@@ -7,7 +7,7 @@ namespace FindRab.models
     public class User
     {
         [Key]
-        public int UserId { get; set; }
+        public int UserID { get; set; }
 
         [Required]
         [StringLength(50)]
