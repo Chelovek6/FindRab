@@ -32,7 +32,7 @@ namespace FindRab.Controllers
         {
             return View();
         }
-
+        [autorize]
         [HttpPost]
         public IActionResult Autorization(SecurityModel auto)
         {

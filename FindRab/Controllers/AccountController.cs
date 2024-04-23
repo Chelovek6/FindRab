@@ -1,5 +1,4 @@
-﻿
-using FindRab.Models;
+﻿using FindRab.Models;
 using FindRab.models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
