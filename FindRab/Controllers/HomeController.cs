@@ -1,11 +1,13 @@
 ﻿using FindRab.models;
 using FindRab.Models;
 using FindRab.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace FindRab.Controllers
 {
+
     public class HomeController : Controller
     {
         BDContext db;
@@ -32,20 +34,12 @@ namespace FindRab.Controllers
         {
             return View();
         }
-        [autorize]
+        
         [HttpPost]
-        public IActionResult Autorization(SecurityModel auto)
+        public IActionResult Privacy()
         {
-            auto.Pass_word = auto.Code(auto.Log_in + auto.Pass_word);
-            if (db.Find(auto.Log_in, auto.Pass_word))
-            {
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                return RedirectToAction("Autorization");
-            }
+            return View();
         }
+
     }
 }
-

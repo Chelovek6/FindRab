@@ -98,7 +98,7 @@ namespace FindRab.Controllers
                     await Authenticate(model.Username);
                     await Authenticate(model.Username);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Home", "index");
                 }
                 else
                 {
