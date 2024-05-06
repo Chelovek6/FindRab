@@ -2,6 +2,7 @@
 
 namespace FindRab.Models
 {
+
     public class SecurityModel
     {
         [Key]
@@ -12,13 +13,13 @@ namespace FindRab.Models
         [StringLength(16, MinimumLength = 3, ErrorMessage = "Длина строки должна быть от 3 до 16 символов")]
         //[Remote(action: "CheckEmail", controller: "Account", ErrorMessage = "Login уже используется")]
         private string _login { get; set; }
-        public string Log_in
+        public string Username
         {
             get => _login;
             set
             {
-               // if (BDContext.Find(value))
-                    _login = value;
+                //if (BDContext.Find(value))
+                //    _login = value;
             }
         }
 

@@ -34,8 +34,8 @@ app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "Account",
-    pattern: "Account/{action}",
-    defaults: new { controller = "Account", action = "Index" });
+    pattern: "{controller=Home}/{action=index}/{id?}");
+   
 
 app.MapControllerRoute(
     name: "default",

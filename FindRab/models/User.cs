@@ -20,5 +20,7 @@ namespace FindRab.models
         [Required]
         [StringLength(20)]
         public string Role { get; set; }
+
+
     }
 }

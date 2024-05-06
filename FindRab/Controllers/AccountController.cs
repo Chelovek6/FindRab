@@ -29,19 +29,19 @@ namespace FindRab.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Autorization(SecurityModel model)
+        public async Task<IActionResult> Autorization(User model)
         {
             SHA256 Hash = SHA256.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Log_in + model.Pass_word);
+            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Username + model.Password);
             byte[] hash = Hash.ComputeHash(inputBytes);
-            model.Pass_word = Convert.ToHexString(hash);
+            model.Password = Convert.ToHexString(hash);
 
             if (ModelState.IsValid)
             {
-                SecurityModel sec = await db.SecurM.FirstOrDefaultAsync(u => u.Log_in == model.Log_in && u.Pass_word == model.Pass_word);
+                User sec = await db.UserM.FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
                 if (sec != null)
                 {
-                    await Authenticate(model.Log_in); // аутентификация
+                    await Authenticate(model.Username); // аутентификация
                     Console.WriteLine("GoodYeeees");
                     return RedirectToAction("Index", "Home");
                 }
@@ -56,23 +56,23 @@ namespace FindRab.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registration(SecurityModel model)
+        public async Task<IActionResult> Registration(User model)
         {
             SHA256 Hash = SHA256.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Log_in + model.Pass_word);
+            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Username + model.Password);
             byte[] hash = Hash.ComputeHash(inputBytes);
-            model.Pass_word = Convert.ToHexString(hash);
+            model.Password = Convert.ToHexString(hash);
 
             if (ModelState.IsValid)
             {
-                SecurityModel sec = await db.SecurM.FirstOrDefaultAsync(u => u.ID_Client == model.ID_Client && u.Log_in == model.Log_in && u.Pass_word == model.Pass_word);
+                User sec = await db.UserM.FirstOrDefaultAsync(u => u.UserID == model.UserID && u.Username == model.Username && u.Password == model.Password);
                 if (sec == null)
                 {
                     // добавляем пользователя в бд
-                    db.SecurM.Add(new SecurityModel { ID_Client = model.ID_Client, Log_in = model.Log_in, Pass_word = model.Pass_word });
+                    db.UserM.Add(new User { UserID = model.UserID, Username = model.Username, Password = model.Password });
                     await db.SaveChangesAsync();
 
-                    await Authenticate(model.Log_in); // аутентификация
+                    await Authenticate(model.Username); // аутентификация
 
                     return RedirectToAction("PostRegistration");
                 }

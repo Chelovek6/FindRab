@@ -13,6 +13,5 @@ namespace FindRab.models
         public int ApplicantId { get; set; }
         public Applicant Applicant { get; set; }
 
-        // Другие свойства об опыте работы
     }
 }
