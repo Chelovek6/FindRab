@@ -1,14 +1,23 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="@Url.Content("~/css/home.css")">
+</head>
+<body>
+    @section Header {
+        <div>Добро пожаловать на сайт компании!</div>
+    }
+    <div class="text-container">
+        <p>Для перехода к другим разделам сайта необходимо авторизироваться или зарегистрироваться.</p>
+        <p><a href="@Url.Action("Login", "Account")">Войти</a> или <a href="@Url.Action("Register", "Account")">Зарегистрироваться</a></p>
 
-    <form method="post" asp-controller="Home" asp-action="index">
-        h1>Круто</h1>
-   <div>
-        @foreach (var item in Model.user)
-        {
-            <p>пользователь:  </p>
-
-        }
     </div>
-    </form>
-    <
-
+    @section Footer {
+        <div>&copy; Создавая будущее вместе: сила, инновации, рост.</div>
+    }
+</body>
+</html>

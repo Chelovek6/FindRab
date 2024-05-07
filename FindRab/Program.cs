@@ -1,47 +1,49 @@
 
+using FindRab.DataContext;
 using FindRab.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder();
 
-// получаем строку подключения из файла конфигурации
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+// Добавление сервисов для MVC
+builder.Services.AddMvc();
 
-// добавляем контекст ApplicationContext в качестве сервиса в приложение
+// Настройка аутентификации на основе куки
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        // Указание пути для входа
+        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+        options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+    });
+
+// Добавление сервисов авторизации
+builder.Services.AddAuthorization();
+
+// Получение строки подключения к базе данных
+string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BDContext>(options => options.UseSqlServer(connection));
 
-// Add services to the container.
+// Добавление сервисов для работы с контроллерами и представлениями
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-app.UseAuthentication();
-
-app.MapControllerRoute(
-    name: "Account",
-    pattern: "{controller=Home}/{action=index}/{id?}");
-   
-
+// Настройка маршрутов для контроллеров
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Autorization}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
+// Включение использования аутентификации и авторизации
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Включение обслуживания статических файлов
+app.UseStaticFiles();
 
 app.Run();
+
+
 

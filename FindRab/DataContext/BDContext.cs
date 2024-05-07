@@ -1,7 +1,8 @@
 ﻿using FindRab.models;
+using FindRab.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FindRab.Models
+namespace FindRab.DataContext
 {
     public class BDContext : DbContext
     {
@@ -16,20 +17,13 @@ namespace FindRab.Models
         public DbSet<Education> EducationsM { get; set; }
         public DbSet<ApplicantSkill> ApplicantSkillsM { get; set; }
         public DbSet<Applicant> ApplicantsM { get; set; }
-        
+
         public BDContext(DbContextOptions<BDContext> options) : base(options)
         {
             Database.EnsureCreated();
         }
 
-        public bool Find(string login)
-        {
-            //foreach (var item in Secur)
-            //{
-            //    if (item.Log_in == login) { return true; }
-            //}
-            return false;
-        }
+
 
     }
 }

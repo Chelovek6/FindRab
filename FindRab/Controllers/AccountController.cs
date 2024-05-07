@@ -1,132 +1,113 @@
-﻿using FindRab.Models;
-using FindRab.models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using FindRab.DataContext;
+using FindRab.Models;
+using FindRab.ViewModels;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
-using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
-using System.Security.Cryptography; // добавляем для использования SHA256
-using System.Threading.Tasks; // добавляем для использования Task
-using System.Collections.Generic; // добавляем для использования List
-
+using System.ComponentModel.DataAnnotations;
+using FindRab.ViewModels;
+using FindRab.models;
 
 namespace FindRab.Controllers
 {
     public class AccountController : Controller
     {
-        private BDContext db;
+        private readonly BDContext _context;
+
         public AccountController(BDContext context)
         {
-            db = context;
+            _context = context;
         }
-        [HttpGet]
-        public IActionResult Autorization()
-        {
-            return View();
-        }
+
+        // POST: /Account/Login
+        // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Autorization(User model)
-        {
-            SHA256 Hash = SHA256.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Username + model.Password);
-            byte[] hash = Hash.ComputeHash(inputBytes);
-            model.Password = Convert.ToHexString(hash);
-
-            if (ModelState.IsValid)
-            {
-                User sec = await db.UserM.FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
-                if (sec != null)
-                {
-                    await Authenticate(model.Username); // аутентификация
-                    Console.WriteLine("GoodYeeees");
-                    return RedirectToAction("Index", "Home");
-                }
-                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-            }
-            return View(model);
-        }
-        [HttpGet]
-        public IActionResult Registration()
-        {
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Registration(User model)
-        {
-            SHA256 Hash = SHA256.Create();
-            byte[] inputBytes = Encoding.ASCII.GetBytes(model.Username + model.Password);
-            byte[] hash = Hash.ComputeHash(inputBytes);
-            model.Password = Convert.ToHexString(hash);
-
-            if (ModelState.IsValid)
-            {
-                User sec = await db.UserM.FirstOrDefaultAsync(u => u.UserID == model.UserID && u.Username == model.Username && u.Password == model.Password);
-                if (sec == null)
-                {
-                    // добавляем пользователя в бд
-                    db.UserM.Add(new User { UserID = model.UserID, Username = model.Username, Password = model.Password });
-                    await db.SaveChangesAsync();
-
-                    await Authenticate(model.Username); // аутентификация
-
-                    return RedirectToAction("PostRegistration");
-                }
-                else
-                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-            }
-            return View(model); 
-        }
-        public async Task<IActionResult> PostRegistration(User model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Поиск пользователя в базе данных по имени пользователя и паролю
-                User existingUser = await db.UserM.FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
+                // Проверяем наличие пользователя в базе данных по логину и паролю
+                var user = await _context.UserM
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
 
-                if (existingUser == null)
+                if (user != null)
                 {
-                    // Если пользователя с такими данными не существует, добавляем его в базу данных
-                    db.UserM.Add(model);
-                    await db.SaveChangesAsync();
-
-                    // После успешной регистрации проводим аутентификацию пользователя
-                    await Authenticate(model.Username);
-                    await Authenticate(model.Username);
-
-                    return RedirectToAction("Home", "index");
+                    // Проверяем роль пользователя
+                    if (user.Role == "Admin")
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else if (user.Role == "User")
+                    {
+                        return RedirectToAction("Index", "Menu");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Роль пользователя не определена");
+                    }
                 }
                 else
                 {
-                    // Если пользователь с такими данными уже существует, выдаем сообщение об ошибке
-                    ModelState.AddModelError("", "Пользователь с такими данными уже существует");
+                    ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
                 }
             }
-            // Если модель не прошла валидацию, возвращаем представление с моделью, чтобы пользователь мог исправить ошибки
             return View(model);
         }
 
-        private async Task Authenticate(string userName)
+        // POST: /Account/Register
+        // POST: /Account/Register
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // создаем один claim
-            var claims = new List<Claim>
+            if (ModelState.IsValid)
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
-            // создаем объект ClaimsIdentity
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            // установка аутентификационных куки
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+                // Проверка на уникальность логина
+                if (await _context.UserM.AnyAsync(u => u.Username == model.Username))
+                {
+                    ModelState.AddModelError("Username", "Пользователь с таким логином уже существует");
+                    return View(model);
+                }
+
+                // Создание нового пользователя с ролью "User"
+                var user = new User
+                {
+                    Username = model.Username,
+                    Password = model.Password,
+                    Role = "User"
+                };
+
+                // Сохранение пользователя в базе данных
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+
+                // Перенаправление на главную страницу для пользователя
+                return RedirectToAction("Index", "Menu");
+            }
+            return View(model);
         }
 
-        public async Task<IActionResult> Logout()
+        // GET: /Account/Login
+        [HttpGet]
+        public IActionResult Login()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Autorization", "Account");
+            return View("~/Views/Account/Login.cshtml");
+        }
+
+        // GET: /Account/Register
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View("~/Views/Account/Register.cshtml");
+        }
+
+        // GET: /Account/RegistrationSuccess
+        public IActionResult RegistrationSuccess()
+        {
+            return View("~/Views/Home/Index.cshtml");
         }
     }
 }
