@@ -35,7 +35,7 @@ namespace FindRab.Controllers
 
                 if (user != null)
                 {
-                    // Проверяем роль пользователя
+                    //Проверяем роль пользователя
                     if (user.Role == "Admin")
                     {
                         return RedirectToAction("Index", "Home");
