@@ -22,8 +22,7 @@ namespace FindRab.DataContext
         {
             Database.EnsureCreated();
         }
-
-
+        
 
     }
 }

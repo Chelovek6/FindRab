@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using FindRab.ViewModels;
+
 using FindRab.models;
 
 namespace FindRab.Controllers
@@ -26,27 +26,54 @@ namespace FindRab.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            //if (ModelState.IsValid)
+            //{
+            //    // Проверяем наличие пользователя в базе данных по логину и паролю
+            //    var user = await _context.UserM
+            //        .Include(u => u.Role)
+            //        .FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
+
+            //    if (user != null)
+            //    {
+            //        //Проверяем роль пользователя
+            //        if (user.Role == "Admin")
+            //        {
+            //            return RedirectToAction("Index", "Home");
+            //        }
+            //        else if (user.Role == "User")
+            //        {
+            //            return RedirectToAction("Index", "Menu");
+            //        }
+            //        else
+            //        {
+            //            ModelState.AddModelError(string.Empty, "Роль пользователя не определена");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
+            //    }
+            //}
             if (ModelState.IsValid)
             {
-                // Проверяем наличие пользователя в базе данных по логину и паролю
                 var user = await _context.UserM
-                    .Include(u => u.Role)
                     .FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
 
                 if (user != null)
                 {
-                    //Проверяем роль пользователя
-                    if (user.Role == "Admin")
+                    var roleCode = user.Role;
+
+                    if (roleCode == 1)
                     {
                         return RedirectToAction("Index", "Home");
                     }
-                    else if (user.Role == "User")
+                    else if (roleCode == 2)
                     {
                         return RedirectToAction("Index", "Menu");
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Роль пользователя не определена");
+                        ModelState.AddModelError(string.Empty, "Некорректный код роли");
                     }
                 }
                 else
@@ -54,6 +81,7 @@ namespace FindRab.Controllers
                     ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
                 }
             }
+
             return View(model);
         }
 
@@ -77,7 +105,7 @@ namespace FindRab.Controllers
                 {
                     Username = model.Username,
                     Password = model.Password,
-                    Role = "User"
+                    Role = 2
                 };
 
                 // Сохранение пользователя в базе данных
