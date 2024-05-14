@@ -41,7 +41,7 @@ namespace FindRab.Controllers
 
                     if (roleCode == 1)
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Admin");
                     }
                     else if (roleCode == 2)
                     {
