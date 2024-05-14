@@ -13,9 +13,11 @@ namespace FindRab.Controllers
     public class HomeController : Controller
     {
         // Действие для отображения главной страницы
+        [Authorize]
         public IActionResult Index()
         {
-            return View();
+            return Content(User.Identity.Name);
+
         }
     }
 }

@@ -1,6 +1,5 @@
 
 using FindRab.DataContext;
-using FindRab.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 

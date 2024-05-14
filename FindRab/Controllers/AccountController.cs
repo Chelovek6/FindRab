@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 using FindRab.models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace FindRab.Controllers
 {
@@ -26,34 +29,7 @@ namespace FindRab.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    // Проверяем наличие пользователя в базе данных по логину и паролю
-            //    var user = await _context.UserM
-            //        .Include(u => u.Role)
-            //        .FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
-
-            //    if (user != null)
-            //    {
-            //        //Проверяем роль пользователя
-            //        if (user.Role == "Admin")
-            //        {
-            //            return RedirectToAction("Index", "Home");
-            //        }
-            //        else if (user.Role == "User")
-            //        {
-            //            return RedirectToAction("Index", "Menu");
-            //        }
-            //        else
-            //        {
-            //            ModelState.AddModelError(string.Empty, "Роль пользователя не определена");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
-            //    }
-            //}
+            
             if (ModelState.IsValid)
             {
                 var user = await _context.UserM
@@ -71,10 +47,7 @@ namespace FindRab.Controllers
                     {
                         return RedirectToAction("Index", "Menu");
                     }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Некорректный код роли");
-                    }
+                    
                 }
                 else
                 {
@@ -131,7 +104,18 @@ namespace FindRab.Controllers
         {
             return View("~/Views/Account/Register.cshtml");
         }
-
+        private async Task Authenticate(string userName)
+        {
+            // создаем один claim
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+    };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
         // GET: /Account/RegistrationSuccess
         public IActionResult RegistrationSuccess()
         {
