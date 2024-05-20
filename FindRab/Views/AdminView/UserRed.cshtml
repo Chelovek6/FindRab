@@ -1,0 +1,70 @@
+﻿@model IEnumerable<FindRab.models.User>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Список пользователей</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <h2>Список пользователей</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Логин</th>
+                <th>Пароль</th>
+                <th>Роль</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.UserID</td>
+                    <td>@user.Username</td>
+                    <td>@user.Password</td>
+                    <td>
+                        @if (user.Role == 1)
+                        {
+                            <span>Админ</span>
+                        }
+                        else if (user.Role == 2)
+                        {
+                            <span>Пользователь</span>
+                        }
+                        else
+                        {
+                            <span>Неизвестная роль</span>
+                        }
+                    </td>
+                    <td>
+                        <form method="post" asp-action="ChangeRole" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
+                            <button type="submit">Изменить роль</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" asp-action="Delete" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
+                            <button type="submit">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+<script>
+    // Функция для проверки id пользователя и вывода сообщения
+    function checkUserId(userId) {
+        if (userId === 16) {
+            alert("Нельзя изменить роль или удалить этого пользователя .");
+            return false; // Отменяем отправку формы
+        }
+        return true; // Продолжаем отправку формы
+    }
+</script>
+</html>
+
