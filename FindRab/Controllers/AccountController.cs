@@ -5,12 +5,10 @@ using FindRab.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-
-using FindRab.models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using FindRab.models;
 
 namespace FindRab.Controllers
 {
@@ -23,13 +21,18 @@ namespace FindRab.Controllers
             _context = context;
         }
 
-        // POST: /Account/Login
+        // GET: /Account/Login
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
         // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            
             if (ModelState.IsValid)
             {
                 var user = await _context.UserM
@@ -37,28 +40,31 @@ namespace FindRab.Controllers
 
                 if (user != null)
                 {
-                    var roleCode = user.Role;
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.Username),
+                        new Claim(ClaimTypes.Role, user.Role.ToString())
+                    };
 
-                    if (roleCode == 1)
-                    {
-                        return RedirectToAction("Index", "AdminView");
-                    }
-                    else if (roleCode == 2)
-                    {
-                        return RedirectToAction("Index", "Menu");
-                    }
-                    
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                    return RedirectToAction("Index", user.Role == 1 ? "AdminView" : "Menu");
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
-                }
+
+                ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
             }
 
             return View(model);
         }
 
-        // POST: /Account/Register
+        // GET: /Account/Register
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -66,14 +72,6 @@ namespace FindRab.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Проверка на уникальность логина
-                if (await _context.UserM.AnyAsync(u => u.Username == model.Username))
-                {
-                    ModelState.AddModelError("Username", "Пользователь с таким логином уже существует");
-                    return View(model);
-                }
-
-                // Создание нового пользователя с ролью "User"
                 var user = new User
                 {
                     Username = model.Username,
@@ -81,41 +79,75 @@ namespace FindRab.Controllers
                     Role = 2
                 };
 
-                // Сохранение пользователя в базе данных
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Перенаправление на главную страницу для пользователя
+                await Authenticate(user.Username);
+
                 return RedirectToAction("Index", "Menu");
             }
+
             return View(model);
         }
 
-        // GET: /Account/Login
+        // GET: /Account/EditProfile
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> EditProfile()
         {
-            return View("~/Views/Account/Login.cshtml");
+            var userName = User.Identity.Name;
+            var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == userName);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditProfileViewModel
+            {
+                Username = user.Username,
+                Password = user.Password
+            };
+
+            return View(model);
         }
 
-        // GET: /Account/Register
-        [HttpGet]
-        public IActionResult Register()
+        // POST: /Account/EditProfile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
         {
-            return View("~/Views/Account/Register.cshtml");
+            if (ModelState.IsValid)
+            {
+                var userName = User.Identity.Name;
+                var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == userName);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.Username = model.Username;
+                user.Password = model.Password;
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", user.Role == 1 ? "AdminView" : "Menu");
+            }
+
+            return View(model);
         }
+
         private async Task Authenticate(string userName)
         {
-            // создаем один claim
             var claims = new List<Claim>
-    {
-        new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-    };
-            // создаем объект ClaimsIdentity
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            // установка аутентификационных куки
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
         }
+
         // GET: /Account/RegistrationSuccess
         public IActionResult RegistrationSuccess()
         {

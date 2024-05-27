@@ -14,11 +14,18 @@ namespace FindRab.models
         public Applicant Applicant { get; set; }
 
         [ForeignKey("Vacancy")]
-        public int VacancyId { get; set; }
+        public int JobId { get; set; }
         public Vacancy Vacancy { get; set; }
 
         [Required]
         [StringLength(20)]
         public string Status { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        public string CoverLetter { get; set; }
+
+        public DateTime AppliedAt { get; set; }
     }
 }
