@@ -23,5 +23,8 @@ namespace FindRab.models
         // Изменяем свойство с new_role на role
         [Column("role")]
         public int Role { get; set; }
+
+        
+        
     }
 }

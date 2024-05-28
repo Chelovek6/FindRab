@@ -1,8 +1,10 @@
 ﻿@model FindRab.ViewModels.VacancyViewModel
 
-<h2>Create Vacancy</h2>
+<h1>Edit Vacancy</h1>
 
-<form asp-action="Create">
+<h4>Vacancy</h4>
+<hr />
+<form asp-action="Edit">
     <div class="form-group">
         <label asp-for="Title" class="control-label"></label>
         <input asp-for="Title" class="form-control" />
@@ -23,13 +25,12 @@
         <input asp-for="Salary" class="form-control" />
         <span asp-validation-for="Salary" class="text-danger"></span>
     </div>
+    <input type="hidden" asp-for="VacancyId" />
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
+        <input type="submit" value="Save" class="btn btn-primary" />
     </div>
 </form>
 
 <div>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
-    @* Если админ, то переходим на AdminView/Index *@
-    @* Если пользователь, то переходим на Home/Index *@
+    <a asp-action="UserVacancies" class="btn btn-secondary">Back to My Vacancies</a>
 </div>

@@ -7,31 +7,30 @@ namespace FindRab.models
     public class Vacancy
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("vacancy_id")]
         public int VacancyId { get; set; }
-
-        [ForeignKey("Employer")]
-        public int EmployerId { get; set; }
-        public Employer Employer { get; set; }
 
         [Required]
         [StringLength(100)]
+        [Column("Title")]
         public string Title { get; set; }
 
         [Required]
+        [Column("Description")]
         public string Description { get; set; }
 
         [Required]
         [StringLength(100)]
+        [Column("Education")]
         public string Education { get; set; }
 
         [Required]
+        [Column("Salary")]
         public decimal Salary { get; set; }
 
-        [Required]
-        public string CreatedBy { get; set; }
-
-        public DateTime CreatedAt { get; set; }
+        [ForeignKey("users")]
+        [Column("user_id")]
+        public int UserId { get; set; }
     }
-
-
 }
