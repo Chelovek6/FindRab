@@ -1,9 +1,12 @@
 ﻿using FindRab.DataContext;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FindRab.Models;
 
 namespace FindRab.Controllers
 {
+    
     public class AdminViewController : Controller
     {
         private readonly BDContext _context;
@@ -33,25 +36,6 @@ namespace FindRab.Controllers
             return View(users);
         }
 
-        //[HttpPost]
-        //public IActionResult ChangeRole([FromBody] int userId)
-        //{
-        //    if (userId == 16) // Проверка на id пользователя 16
-        //    {
-        //        Console.WriteLine("Ошибка: Невозможно изменить роль первого пользователя.");
-        //        ModelState.AddModelError(string.Empty, "Невозможно изменить роль первого пользователя.");
-        //        return RedirectToAction("UserList"); // Перенаправление на страницу списка пользователей
-        //    }
-
-        //    var user = _context.UserM.Find(userId);
-        //    if (user != null && user.Role != 1) // Проверка на существование пользователя и его роль
-        //    {
-        //        // Смена роли пользователя
-        //        user.Role = (user.Role == 1) ? 2 : 1; // Если роль пользователя 1, меняем на 2 и наоборот
-        //        _context.SaveChanges(); // Сохранение изменений в базе данных
-        //    }
-        //    return RedirectToAction("UserList"); // Перенаправление на страницу списка пользователей
-        //}
         [HttpPost]
         public async Task<IActionResult> ChangeRole(int userId)
         {

@@ -19,6 +19,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // Добавление сервисов авторизации
 builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("Role", "1"));
+});
 
 // Получение строки подключения к базе данных
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -32,7 +36,7 @@ var app = builder.Build();
 // Настройка маршрутов для контроллеров
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Menu}/{action=Index}/{id?}");
 
 
 // Включение использования аутентификации и авторизации

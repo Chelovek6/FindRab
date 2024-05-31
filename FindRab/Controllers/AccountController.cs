@@ -136,7 +136,11 @@ namespace FindRab.Controllers
 
             return View(model);
         }
-
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account"); 
+        }
         private async Task Authenticate(string userName)
         {
             var claims = new List<Claim>
@@ -151,7 +155,7 @@ namespace FindRab.Controllers
         // GET: /Account/RegistrationSuccess
         public IActionResult RegistrationSuccess()
         {
-            return View("~/Views/Home/Index.cshtml");
+            return View("~/Views/Menu/Index.cshtml");
         }
     }
 }

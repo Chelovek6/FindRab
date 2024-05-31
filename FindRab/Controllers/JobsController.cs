@@ -1,6 +1,7 @@
 ﻿using FindRab.DataContext;
 using FindRab.models;
 using FindRab.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace FindRab.Controllers
 {
+    [Authorize]
     public class JobsController : Controller
     {
         private readonly BDContext _context;
@@ -69,26 +71,48 @@ namespace FindRab.Controllers
 
         // POST: Jobs/Create
         [HttpPost]
+
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VacancyViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var currentUser = User.Identity.Name;
+                var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+
+                if (user == null)
+                {
+                    // Если текущий пользователь не найден, перенаправляем на страницу логина или выводим ошибку
+                    ModelState.AddModelError("", "Пользователь не найден. Пожалуйста, войдите в систему.");
+                    return RedirectToAction("Login", "Account");
+                }
+
                 var vacancy = new Vacancy
                 {
                     Title = model.Title,
                     Description = model.Description,
                     Education = model.Education,
                     Salary = model.Salary,
-                    UserId = model.UserId
+                    UserId = user.UserID // Устанавливаем UserId текущего пользователя
                 };
 
-                _context.Add(vacancy);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(vacancy);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    ModelState.AddModelError("", "Не удалось сохранить изменения. Попробуйте еще раз, и если проблема не исчезнет, обратитесь к системному администратору.");
+                    // Логирование исключения
+                    Console.WriteLine(ex.InnerException?.Message);
+                    return View(model);
+                }
             }
             return View(model);
         }
+
 
         // GET: Jobs/UserVacancies
         public async Task<IActionResult> UserVacancies()
