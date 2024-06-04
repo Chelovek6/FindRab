@@ -37,5 +37,10 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Index" class="btn btn-primary">Back to List</a>
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+    }
+
+    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 </div>

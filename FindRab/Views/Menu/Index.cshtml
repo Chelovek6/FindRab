@@ -1,82 +1,43 @@
-﻿q<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FindRab</title>
-    <style>
-        body {
-            background-color: #ff6666; /* Красный цвет фона */
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        #title {
-            font-size: 36px;
-            font-weight: bold;
-            color: white;
-            padding: 20px;
-        }
-
-        #welcome-text {
-            font-size: 24px;
-            color: white;
-            padding: 20px;
-        }
-
-        .button-container {
-            margin-top: 50px;
-        }
-
-            .button-container button {
-                font-size: 20px;
-                padding: 10px 20px;
-                margin: 10px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-
-        .return-button {
-            background-color: #fff;
-            color: #ff6666;
-        }
-
-        .create-resume-button {
-            background-color: #fff;
-            color: #ff6666;
-        }
-    </style>
+    <link rel="stylesheet" href=./css/site.css>
+    
+    
 </head>
 <body>
-    <div id="title">FindRab</div>
+    <header>
+        <div id="title">FindRab</div>
+        <div class="dropdown">
+           
+           
+                <a class="dropdown-item" href="/Account/EditProfile">Профиль</a>
+                <a class="dropdown-item" href="/Jobs/UserVacancies">Созданные вакансии</a>
+                <a class="dropdown-item" href="/Jobs/UserResponses">Откликнутые вакансии</a>
+            <a class="dropdown-item" href="/Account/EditProfile">Настройки</a>
+                <div class="dropdown-divider"></div>
+                <form method="post" action="/Account/Logout">
+                    <button type="submit" class="dropdown-item">Выйти</button>
+                </form>
+           
+        </div>
+    </header>
     <div id="welcome-text">Добро пожаловать на сайт поиска работы!</div>
     <div class="button-container">
         <form method="get" action="/Jobs/Index">
-            <button type="submit" class="return-button">Откликнуться на резюме</button>
+            <button type="submit" class="return-button">Найти резюме</button>
         </form>
         <form method="get" action="/Jobs/Create">
             <button type="submit" class="create-resume-button">Создать резюме</button>
         </form>
     </div>
-    <a asp-controller="Account" asp-action="EditProfile" class="btn btn-primary">Edit Profile</a>
-    <ul class="navbar-nav">
-        @if (User.Identity.IsAuthenticated)
-        {
-            <li class="nav-item">
-                <form method="post" asp-controller="Account" asp-action="Logout">
-                    <button type="submit" class="btn btn-link nav-link" style="border: none; background: none;">Logout</button>
-                </form>
-            </li>
-        }
-    </ul>
-    <div class="button-container">
-        <form method="get" asp-action="Index" asp-controller="Home">
-            <button type="submit" class="return-button">Вернуться на главную страницу</button>
-        </form>
-    </div>
+    <footer>
+        <p>&copy; 2024 FindRab. Все права защищены.</p>
+    </footer>
+
+    
 </body>
 </html>
-

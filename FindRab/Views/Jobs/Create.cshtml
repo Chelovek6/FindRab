@@ -29,7 +29,10 @@
 </form>
 
 <div>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
-    @* Если админ, то переходим на AdminView/Index *@
-    @* Если пользователь, то переходим на Home/Index *@
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+    }
+    
+    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 </div>
