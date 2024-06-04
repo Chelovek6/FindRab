@@ -1,5 +1,6 @@
 ﻿using FindRab.DataContext;
 using FindRab.models;
+using FindRab.Models;
 using FindRab.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,9 @@ namespace FindRab.Controllers
                 Description = v.Description,
                 Education = v.Education,
                 Salary = v.Salary,
-                UserId = v.UserId
+                UserId = v.UserId,
+                Phone = v.Phone,
+                Email = v.Email
             }).ToList();
 
             return View(model);
@@ -57,7 +60,9 @@ namespace FindRab.Controllers
                 Description = vacancy.Description,
                 Education = vacancy.Education,
                 Salary = vacancy.Salary,
-                UserId = vacancy.UserId
+                UserId = vacancy.UserId,
+                Phone = vacancy.Phone,
+                Email = vacancy.Email
             };
 
             return View(model);
@@ -71,7 +76,6 @@ namespace FindRab.Controllers
 
         // POST: Jobs/Create
         [HttpPost]
-
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VacancyViewModel model)
         {
@@ -93,7 +97,9 @@ namespace FindRab.Controllers
                     Description = model.Description,
                     Education = model.Education,
                     Salary = model.Salary,
-                    UserId = user.UserID // Устанавливаем UserId текущего пользователя
+                    UserId = user.UserID, // Устанавливаем UserId текущего пользователя
+                    Phone = model.Phone,
+                    Email = model.Email
                 };
 
                 try
@@ -112,7 +118,6 @@ namespace FindRab.Controllers
             }
             return View(model);
         }
-
 
         // GET: Jobs/UserVacancies
         public async Task<IActionResult> UserVacancies()
@@ -135,7 +140,9 @@ namespace FindRab.Controllers
                 Description = v.Description,
                 Education = v.Education,
                 Salary = v.Salary,
-                UserId = v.UserId
+                UserId = v.UserId,
+                Phone = v.Phone,
+                Email = v.Email
             }).ToList();
 
             return View(model);
@@ -162,7 +169,9 @@ namespace FindRab.Controllers
                 Description = vacancy.Description,
                 Education = vacancy.Education,
                 Salary = vacancy.Salary,
-                UserId = vacancy.UserId
+                UserId = vacancy.UserId,
+                Phone = vacancy.Phone,
+                Email = vacancy.Email
             };
 
             return View(model);
@@ -193,6 +202,8 @@ namespace FindRab.Controllers
                     vacancy.Education = model.Education;
                     vacancy.Salary = model.Salary;
                     vacancy.UserId = model.UserId;
+                    vacancy.Phone = model.Phone;
+                    vacancy.Email = model.Email;
 
                     _context.Update(vacancy);
                     await _context.SaveChangesAsync();
@@ -216,6 +227,43 @@ namespace FindRab.Controllers
         private bool VacancyExists(int id)
         {
             return _context.VacanciesM.Any(e => e.VacancyId == id);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Apply(int vacancyId)
+        {
+            var currentUser = User.Identity.Name;
+            var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == vacancyId);
+            if (vacancy == null)
+            {
+                return NotFound();
+            }
+
+            var existingApplication = await _context.JobApplicationsM
+                .FirstOrDefaultAsync(a => a.UserId == user.UserID && a.VacancyId == vacancyId);
+
+            if (existingApplication == null)
+            {
+                var application = new JobApplication
+                {
+                    UserId = user.UserID,
+                    VacancyId = vacancyId,
+                    Status = "Applied"
+                };
+
+                _context.JobApplicationsM.Add(application);
+                vacancy.ApplicationCount += 1;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { Phone = vacancy.Phone, Email = vacancy.Email });
         }
     }
 }

@@ -13,6 +13,8 @@
             <th>Description</th>
             <th>Education</th>
             <th>Salary</th>
+            <th>Phone</th>
+            <th>Email</th>
             <th></th>
         </tr>
     </thead>
@@ -24,6 +26,8 @@
                 <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>@Html.DisplayFor(modelItem => item.Education)</td>
                 <td>@Html.DisplayFor(modelItem => item.Salary)</td>
+                <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.VacancyId" class="btn btn-primary">Edit</a>
                 </td>

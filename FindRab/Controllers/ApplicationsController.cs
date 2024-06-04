@@ -26,21 +26,8 @@ namespace FindRab.Controllers
             return View();
         }
 
-        // POST: Applications/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("JobId,CoverLetter")] JobApplication application)
-        {
-            if (ModelState.IsValid)
-            {
-                application.UserId = User.Identity.Name;
-                application.AppliedAt = DateTime.Now;
-                _context.Add(application);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Details", "Jobs", new { id = application.JobId });
-            }
-            return View(application);
-        }
+        
+        
     }
 }
 
