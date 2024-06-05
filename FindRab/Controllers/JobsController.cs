@@ -233,37 +233,68 @@ namespace FindRab.Controllers
         [Authorize]
         public async Task<IActionResult> Apply(int vacancyId)
         {
-            var currentUser = User.Identity.Name;
-            var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var currentUser = User.Identity.Name;
+                Console.WriteLine($"Current user: {currentUser}");
 
-            var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == vacancyId);
-            if (vacancy == null)
-            {
-                return NotFound();
-            }
-
-            var existingApplication = await _context.JobApplicationsM
-                .FirstOrDefaultAsync(a => a.UserId == user.UserID && a.VacancyId == vacancyId);
-
-            if (existingApplication == null)
-            {
-                var application = new JobApplication
+                var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+                if (user == null)
                 {
-                    UserId = user.UserID,
-                    VacancyId = vacancyId,
-                    Status = "Applied"
+                    Console.WriteLine("User not found");
+                    return NotFound();
+                }
+
+                var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == vacancyId);
+                if (vacancy == null)
+                {
+                    Console.WriteLine("Vacancy not found");
+                    return NotFound();
+                }
+
+                var existingApplication = await _context.JobApplicationsM
+                    .FirstOrDefaultAsync(a => a.UserId == user.UserID && a.VacancyId == vacancyId);
+
+                if (existingApplication == null)
+                {
+                    var application = new JobApplication
+                    {
+                        UserId = user.UserID,
+                        VacancyId = vacancyId
+                    };
+
+                    _context.JobApplicationsM.Add(application);
+                    vacancy.ApplicationCount += 1;
+                    await _context.SaveChangesAsync();
+                }
+
+                var viewModel = new VacancyViewModel
+                {
+                    VacancyId = vacancy.VacancyId,
+                    Title = vacancy.Title,
+                    Description = vacancy.Description,
+                    Education = vacancy.Education,
+                    Salary = vacancy.Salary,
+                    UserId = vacancy.UserId,
+                    Phone = vacancy.Phone,
+                    Email = vacancy.Email,
+                    ApplicationCount = vacancy.ApplicationCount
                 };
 
-                _context.JobApplicationsM.Add(application);
-                vacancy.ApplicationCount += 1;
-                await _context.SaveChangesAsync();
-            }
+                ViewBag.Phone = vacancy.Phone;
+                ViewBag.Email = vacancy.Email;
 
-            return Json(new { Phone = vacancy.Phone, Email = vacancy.Email });
+                return View("Details", viewModel);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
+
+
+
     }
 }

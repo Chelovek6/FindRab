@@ -8,17 +8,17 @@ namespace FindRab.Models
     public class JobApplication
     {
         [Key]
+        [Column("application_id")]
         public int ApplicationId { get; set; }
 
-        [ForeignKey("Vacancy")]
+        [Required]
+        [ForeignKey("VacancyId")]
         public int VacancyId { get; set; }
-        public Vacancy Vacancy { get; set; }
+       
+        
 
         [Required]
-        [StringLength(20)]
-        public string Status { get; set; }
-
-        [Required]
+        [Column("UserId")]
         public int UserId { get; set; }
     }
 }

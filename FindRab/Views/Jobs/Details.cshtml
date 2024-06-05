@@ -48,42 +48,25 @@
         </dd>
     </dl>
 </div>
-<div>
-    <button id="applyButton" class="btn btn-primary" data-vacancy-id="@Model.VacancyId">Apply</button>
-    <div id="contactInfo" style="display: none;">
-        <p>Phone: <span id="contactPhone"></span></p>
-        <p>Email: <span id="contactEmail"></span></p>
+
+<form asp-action="Apply" asp-controller="Jobs" method="post">
+    <input type="hidden" name="vacancyId" value="@Model.VacancyId" />
+    <button type="submit" class="btn btn-primary">Apply</button>
+</form>
+
+@if (ViewBag.Phone != null && ViewBag.Email != null)
+{
+    <div id="contactInfo">
+        <p>Phone: @ViewBag.Phone</p>
+        <p>Email: @ViewBag.Email</p>
     </div>
-    <div>
-        @{
-            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
-        }
-
-        <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
-    </div>
-
-</div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('#applyButton').click(function () {
-                var vacancyId = $(this).data('vacancy-id');
-                $.ajax({
-                    url: '@Url.Action("Apply", "Jobs")',
-                    type: 'POST',
-                    data: { vacancyId: vacancyId },
-                    success: function (data) {
-                        $('#contactPhone').text(data.phone);
-                        $('#contactEmail').text(data.email);
-                        $('#contactInfo').show();
-                    },
-                    error: function () {
-                        alert('Error while applying');
-                    }
-                });
-            });
-        });
-    </script>
 }
+
+<div>
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+    }
+
+    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
+</div>

@@ -19,6 +19,7 @@ namespace FindRab.Controllers
         public AccountController(BDContext context)
         {
             _context = context;
+            _context.UserM.Load();
         }
 
         // GET: /Account/Login
