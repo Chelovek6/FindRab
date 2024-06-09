@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Vacancy Details";
+    var isOwner = Model.CurrentUserId == Model.UserId;
 }
 
 <h1>Vacancy Details</h1>
@@ -49,16 +50,26 @@
     </dl>
 </div>
 
-<form asp-action="Apply" asp-controller="Jobs" method="post">
-    <input type="hidden" name="vacancyId" value="@Model.VacancyId" />
-    <button type="submit" class="btn btn-primary">Apply</button>
-</form>
+<p>Current User ID: @Model.CurrentUserId</p>
+<p>Vacancy Owner ID: @Model.UserId</p>
 
-@if (ViewBag.Phone != null && ViewBag.Email != null)
+@if (isOwner)
+{
+    <a href="@Url.Action("Edit", "Jobs", new { id = Model.VacancyId })" class="btn btn-primary">Edit</a>
+}
+else
+{
+    <form asp-action="Apply" asp-controller="Jobs" method="post">
+        <input type="hidden" name="vacancyId" value="@Model.VacancyId" />
+        <button type="submit" class="btn btn-primary">Apply</button>
+    </form>
+}
+
+@if (Model.Phone != null && Model.Email != null)
 {
     <div id="contactInfo">
-        <p>Phone: @ViewBag.Phone</p>
-        <p>Email: @ViewBag.Email</p>
+        <p>Phone: @Model.Phone</p>
+        <p>Email: @Model.Email</p>
     </div>
 }
 
@@ -70,3 +81,5 @@
 
     <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 </div>
+
+<link href="~/css/source.css" rel="stylesheet" />

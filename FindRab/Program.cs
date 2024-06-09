@@ -1,9 +1,10 @@
 
 using FindRab.DataContext;
+using FindRab.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder();
+var builder = WebApplication.CreateBuilder(args);
 
 // Добавление сервисов для MVC
 builder.Services.AddMvc();
@@ -12,13 +13,11 @@ builder.Services.AddMvc();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        // Указание пути для входа
         options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
         options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
     });
 
 // Добавление сервисов авторизации
-builder.Services.AddAuthorization();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("Role", "1"));
@@ -33,20 +32,38 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Настройка маршрутов для контроллеров
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Menu}/{action=Index}/{id?}");
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
 
 // Включение использования аутентификации и авторизации
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Включение обслуживания статических файлов
-app.UseStaticFiles();
+// Middleware для перенаправления в зависимости от ролей
+app.UseMiddleware<RoleRedirectMiddleware>();
+
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Admin/{controller=AdminView}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "user",
+    pattern: "User/{controller=Menu}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Menu}/{action=Index}/{id?}");
 
 app.Run();
-
-
-

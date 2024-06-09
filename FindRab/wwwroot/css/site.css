@@ -1,41 +1,81 @@
 
-body {
-    background-color: #ffffff; /* Белый цвет фона */
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+@model IEnumerable<FindRab.ViewModels.VacancyViewModel>
+
+@{
+    ViewData["Title"] = "Vacancies";
 }
 
-header, footer {
-    background-color: #ff6666; /* Красный цвет */
-    color: white;
-    padding: 10px 20px; /* Уменьшенная высота */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+<h1>Vacancies</h1>
 
-#title {
-    font-size: 24px; /* Уменьшенный размер шрифта */
-    font-weight: bold;
-    margin: 0;
-}
+<div class="vacancy-list">
+    @foreach (var item in Model)
+    {
+        <div class="vacancy-card">
+            <h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+            <p><strong>Description:</strong> @Html.DisplayFor(modelItem => item.Description)</p>
+            <p><strong>Education:</strong> @Html.DisplayFor(modelItem => item.Education)</p>
+            <p><strong>Salary:</strong> @Html.DisplayFor(modelItem => item.Salary)</p>
+            <p><strong>Phone:</strong> @Html.DisplayFor(modelItem => item.Phone)</p>
+            <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
+            <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-info">Details</a>
+        </div>
+    }
+</div>
 
-#welcome-text {
-    font-size: 24px;
-    color: #ff6666; /* Красный цвет текста */
-    margin: 50px 0; /* Отступ сверху и снизу */
-    text-align: center;
-}
+<div class="pagination">
+    <a href="?page=1" class="page-link">1</a>
+    <a href="?page=2" class="page-link">2</a>
+    <a href="?page=3" class="page-link">3</a>
+    <!-- Добавьте больше страниц по мере необходимости -->
+</div>
 
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
+<div>
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+    }
+
+    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
+</div>
+
+<style>
+    body {
+        background-color: #ffffff; /* Белый цвет фона */
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    header, footer {
+        background-color: #ff6666; /* Красный цвет */
+        color: white;
+        padding: 10px 20px; /* Уменьшенная высота */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #title {
+        font-size: 24px; /* Уменьшенный размер шрифта */
+        font-weight: bold;
+        margin: 0;
+    }
+
+    #welcome-text {
+        font-size: 24px;
+        color: #ff6666; /* Красный цвет текста */
+        margin: 50px 0; /* Отступ сверху и снизу */
+        text-align: center;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
 
     .button-container button {
         font-size: 20px;
@@ -49,25 +89,76 @@ header, footer {
         width: 250px; /* Фиксированная ширина кнопок */
     }
 
-.dropdown-menu {
-    background-color: #ffffff; /* Белый цвет фона */
-    border: none;
-}
+    .dropdown-menu {
+        background-color: #ffffff; /* Белый цвет фона */
+        border: none;
+    }
 
     .dropdown-menu a {
         color: #ff6666; /* Красный цвет текста */
     }
 
-footer {
-    text-align: center;
-    margin-top: auto; /* Для фиксации footer внизу */
-}
+    footer {
+        text-align: center;
+        margin-top: auto; /* Для фиксации footer внизу */
+    }
 
-.dropdown-toggle::after {
-    border-top: .3em solid;
-    border-right: .3em solid transparent;
-    border-bottom: 0;
-    border-left: .3em solid transparent;
-}
+    .dropdown-toggle::after {
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
 
+    .vacancy-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+    }
 
+    .vacancy-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 300px;
+    }
+
+    .vacancy-card h2 {
+        margin-top: 0;
+        color: #ff6666;
+    }
+
+    .vacancy-card p {
+        margin: 5px 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 0;
+        text-decoration: none;
+        border-radius: 5px;
+        color: #ffffff;
+        background-color: #ff6666;
+        text-align: center;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .page-link {
+        margin: 0 5px;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        background-color: #ff6666;
+        color: #ffffff;
+    }
+</style>

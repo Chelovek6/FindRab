@@ -1,12 +1,11 @@
 ﻿using FindRab.DataContext;
+using FindRab.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FindRab.Models;
 
 namespace FindRab.Controllers
 {
-    
     public class AdminViewController : Controller
     {
         private readonly BDContext _context;
@@ -23,23 +22,19 @@ namespace FindRab.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UserRed()
+        public async Task<IActionResult> UserRed(int page = 1)
         {
-            var users = await _context.UserM.ToListAsync();
-            return View(users);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> UserList()
-        {
-            var users = await _context.UserM.ToListAsync();
+            int pageSize = 15;
+            var users = await _context.UserM.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            ViewBag.TotalPages = (int)Math.Ceiling((double)_context.UserM.Count() / pageSize);
+            ViewBag.CurrentPage = page;
             return View(users);
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangeRole(int userId)
         {
-            if (userId == 16) // Проверка на id пользователя 16
+            if (userId == 16)
             {
                 TempData["ErrorMessage"] = "Нельзя изменить роль первого пользователя.";
             }
@@ -48,17 +43,17 @@ namespace FindRab.Controllers
                 var user = await _context.UserM.FindAsync(userId);
                 if (user != null)
                 {
-                    // Смена роли пользователя
-                    user.Role = (user.Role == 1) ? 2 : 1; // Если роль пользователя 1, меняем на 2 и наоборот
-                    await _context.SaveChangesAsync(); // Сохранение изменений в базе данных
+                    user.Role = (user.Role == 1) ? 2 : 1;
+                    await _context.SaveChangesAsync();
                 }
             }
             return RedirectToAction("UserRed");
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int userId)
         {
-            if (userId == 16) // Проверка на id пользователя 16
+            if (userId == 16)
             {
                 TempData["ErrorMessage"] = "Нельзя удалить первого пользователя.";
                 return RedirectToAction("Index");
@@ -73,5 +68,37 @@ namespace FindRab.Controllers
             return RedirectToAction("UserRed");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> BulkChangeRole(int[] selectedUsers)
+        {
+            if (selectedUsers.Contains(16))
+            {
+                TempData["ErrorMessage"] = "Нельзя изменить роль первого пользователя.";
+                return RedirectToAction("UserRed");
+            }
+
+            var users = await _context.UserM.Where(u => selectedUsers.Contains(u.UserID)).ToListAsync();
+            foreach (var user in users)
+            {
+                user.Role = (user.Role == 1) ? 2 : 1;
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("UserRed");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkDelete(int[] selectedUsers)
+        {
+            if (selectedUsers.Contains(16))
+            {
+                TempData["ErrorMessage"] = "Нельзя удалить первого пользователя.";
+                return RedirectToAction("UserRed");
+            }
+
+            var users = await _context.UserM.Where(u => selectedUsers.Contains(u.UserID)).ToListAsync();
+            _context.UserM.RemoveRange(users);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("UserRed");
+        }
     }
 }

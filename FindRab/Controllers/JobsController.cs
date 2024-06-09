@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FindRab.Controllers
@@ -40,33 +41,33 @@ namespace FindRab.Controllers
         }
 
         // GET: Jobs/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == id);
-            if (vacancy == null)
-            {
-                return NotFound();
-            }
+        //    var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == id);
+        //    if (vacancy == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var model = new VacancyViewModel
-            {
-                VacancyId = vacancy.VacancyId,
-                Title = vacancy.Title,
-                Description = vacancy.Description,
-                Education = vacancy.Education,
-                Salary = vacancy.Salary,
-                UserId = vacancy.UserId,
-                Phone = vacancy.Phone,
-                Email = vacancy.Email
-            };
+        //    var model = new VacancyViewModel
+        //    {
+        //        VacancyId = vacancy.VacancyId,
+        //        Title = vacancy.Title,
+        //        Description = vacancy.Description,
+        //        Education = vacancy.Education,
+        //        Salary = vacancy.Salary,
+        //        UserId = vacancy.UserId,
+        //        Phone = vacancy.Phone,
+        //        Email = vacancy.Email
+        //    };
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
         // GET: Jobs/Create
         public IActionResult Create()
@@ -147,7 +148,7 @@ namespace FindRab.Controllers
 
             return View(model);
         }
-
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////
         // GET: Jobs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -169,7 +170,7 @@ namespace FindRab.Controllers
                 Description = vacancy.Description,
                 Education = vacancy.Education,
                 Salary = vacancy.Salary,
-                UserId = vacancy.UserId,
+                
                 Phone = vacancy.Phone,
                 Email = vacancy.Email
             };
@@ -201,7 +202,7 @@ namespace FindRab.Controllers
                     vacancy.Description = model.Description;
                     vacancy.Education = model.Education;
                     vacancy.Salary = model.Salary;
-                    vacancy.UserId = model.UserId;
+                  
                     vacancy.Phone = model.Phone;
                     vacancy.Email = model.Email;
 
@@ -228,6 +229,40 @@ namespace FindRab.Controllers
         {
             return _context.VacanciesM.Any(e => e.VacancyId == id);
         }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+
+            var currentUser = User.Identity.Name;
+            var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == id);
+            if (vacancy == null)
+            {
+                return NotFound();
+            }
+
+            var applicationCount = await _context.JobApplicationsM.CountAsync(a => a.VacancyId == id);
+
+            var viewModel = new VacancyViewModel
+            {
+                VacancyId = vacancy.VacancyId,
+                Title = vacancy.Title,
+                Description = vacancy.Description,
+                Education = vacancy.Education,
+                Salary = vacancy.Salary,
+                UserId = vacancy.UserId,
+                Phone = vacancy.Phone,
+                Email = vacancy.Email,
+                ApplicationCount = applicationCount
+            };
+
+            return View(viewModel);
+        }
 
         [HttpPost]
         [Authorize]
@@ -236,19 +271,15 @@ namespace FindRab.Controllers
             try
             {
                 var currentUser = User.Identity.Name;
-                Console.WriteLine($"Current user: {currentUser}");
-
                 var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
                 if (user == null)
                 {
-                    Console.WriteLine("User not found");
                     return NotFound();
                 }
 
                 var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == vacancyId);
                 if (vacancy == null)
                 {
-                    Console.WriteLine("Vacancy not found");
                     return NotFound();
                 }
 
@@ -264,34 +295,63 @@ namespace FindRab.Controllers
                     };
 
                     _context.JobApplicationsM.Add(application);
-                    vacancy.ApplicationCount += 1;
                     await _context.SaveChangesAsync();
                 }
 
-                var viewModel = new VacancyViewModel
-                {
-                    VacancyId = vacancy.VacancyId,
-                    Title = vacancy.Title,
-                    Description = vacancy.Description,
-                    Education = vacancy.Education,
-                    Salary = vacancy.Salary,
-                    UserId = vacancy.UserId,
-                    Phone = vacancy.Phone,
-                    Email = vacancy.Email,
-                    ApplicationCount = vacancy.ApplicationCount
-                };
-
-                ViewBag.Phone = vacancy.Phone;
-                ViewBag.Email = vacancy.Email;
-
-                return View("Details", viewModel);
+                return RedirectToAction("Details", new { id = vacancyId });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
+        // //////////////////////////////////////////////////////////////////
+        // Метод для получения ID текущего пользователя
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == id);
+            if (vacancy == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (currentUserIdClaim == null)
+            {
+                return Forbid();
+            }
+
+            int currentUserId;
+            if (!int.TryParse(currentUserIdClaim.Value, out currentUserId))
+            {
+                return Forbid();
+            }
+
+            var model = new VacancyViewModel
+            {
+                VacancyId = vacancy.VacancyId,
+                Title = vacancy.Title,
+                Description = vacancy.Description,
+                Education = vacancy.Education,
+                Salary = vacancy.Salary,
+                UserId = vacancy.UserId,
+                Phone = vacancy.Phone,
+                Email = vacancy.Email,
+                ApplicationCount = vacancy.ApplicationCount,
+                CurrentUserId = currentUserId // Передача идентификатора текущего пользователя
+            };
+
+            return View(model);
+        }
+
+
+
 
 
 

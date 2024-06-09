@@ -6,35 +6,27 @@
 
 <h1>Vacancies</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Education</th>
-            <th>Salary</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                <td>@Html.DisplayFor(modelItem => item.Education)</td>
-                <td>@Html.DisplayFor(modelItem => item.Salary)</td>
-                <td>@Html.DisplayFor(modelItem => item.Phone)</td>
-                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-info">Details</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="vacancy-list">
+    @foreach (var item in Model)
+    {
+        <div class="vacancy-card">
+            <h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+            <p><strong>Description:</strong> @Html.DisplayFor(modelItem => item.Description)</p>
+            <p><strong>Education:</strong> @Html.DisplayFor(modelItem => item.Education)</p>
+            <p><strong>Salary:</strong> @Html.DisplayFor(modelItem => item.Salary)</p>
+            <p><strong>Phone:</strong> @Html.DisplayFor(modelItem => item.Phone)</p>
+            <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
+            <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-info">Details</a>
+        </div>
+    }
+</div>
+
+<div class="pagination">
+    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+    {
+        <a href="@Url.Action("UserRed", new { page = i })" class="btn @(i == ViewBag.CurrentPage ? "btn-primary" : "btn-secondary")">@i</a>
+    }
+</div>
 
 <div>
     @{
@@ -44,3 +36,5 @@
 
     <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 </div>
+
+<link href="~/css/source.css" rel="stylesheet" />

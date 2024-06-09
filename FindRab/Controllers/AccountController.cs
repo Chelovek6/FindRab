@@ -43,6 +43,7 @@ namespace FindRab.Controllers
                 {
                     var claims = new List<Claim>
                     {
+                        new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                         new Claim(ClaimsIdentity.DefaultNameClaimType, user.Username),
                         new Claim(ClaimTypes.Role, user.Role.ToString())
                     };
@@ -73,6 +74,13 @@ namespace FindRab.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userExists = await _context.UserM.AnyAsync(u => u.Username == model.Username);
+                if (userExists)
+                {
+                    ModelState.AddModelError("Username", "Имя пользователя уже занято");
+                    return View(model);
+                }
+
                 var user = new User
                 {
                     Username = model.Username,
@@ -127,6 +135,17 @@ namespace FindRab.Controllers
                     return NotFound();
                 }
 
+                // Проверка уникальности имени пользователя, если оно изменилось
+                if (model.Username != user.Username)
+                {
+                    var userExists = await _context.UserM.AnyAsync(u => u.Username == model.Username);
+                    if (userExists)
+                    {
+                        ModelState.AddModelError("Username", "Имя пользователя уже занято");
+                        return View(model);
+                    }
+                }
+
                 user.Username = model.Username;
                 user.Password = model.Password;
                 _context.Update(user);
@@ -140,7 +159,7 @@ namespace FindRab.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account"); 
+            return RedirectToAction("Login", "Account");
         }
         private async Task Authenticate(string userName)
         {

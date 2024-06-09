@@ -9,69 +9,95 @@
 </head>
 <body>
     <h2>Список пользователей</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Логин</th>
-                <th>Пароль</th>
-                <th>Роль</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
+    <form id="bulkForm" method="post">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@user.UserID</td>
-                    <td>@user.Username</td>
-                    <td>@user.Password</td>
-                    <td>
-                        @if (user.Role == 1)
-                        {
-                            <span>Админ</span>
-                        }
-                        else if (user.Role == 2)
-                        {
-                            <span>Пользователь</span>
-                        }
-                        else
-                        {
-                            <span>Неизвестная роль</span>
-                        }
-                    </td>
-                    <td>
-                        <form method="post" asp-action="ChangeRole" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
-                            <button type="submit">Изменить роль</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="post" asp-action="Delete" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
-                            <button type="submit">Удалить</button>
-                        </form>
-                    </td>
+                    <th><input type="checkbox" id="selectAll" /></th>
+                    <th>ID</th>
+                    <th>Логин</th>
+                    <th>Пароль</th>
+                    <th>Роль</th>
+                    <th></th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</body>
-<script>
-    // Функция для проверки id пользователя и вывода сообщения
-    function checkUserId(userId) {
-        if (userId === 16) {
-            alert("Нельзя изменить роль или удалить этого пользователя .");
-            return false; // Отменяем отправку формы
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td><input type="checkbox" name="selectedUsers" value="@user.UserID" /></td>
+                        <td>@user.UserID</td>
+                        <td>@user.Username</td>
+                        <td>@user.Password</td>
+                        <td>
+                            @if (user.Role == 1)
+                            {
+                                <span>Админ</span>
+                            }
+                            else if (user.Role == 2)
+                            {
+                                <span>Пользователь</span>
+                            }
+                            else
+                            {
+                                <span>Неизвестная роль</span>
+                            }
+                        </td>
+                        <td>
+                            <form method="post" asp-action="ChangeRole" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
+                                <button type="submit">Изменить роль</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" asp-action="Delete" asp-route-userId="@user.UserID" onsubmit="return checkUserId(@user.UserID)">
+                                <button type="submit">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" onclick="submitBulkForm('/AdminView/BulkChangeRole')">Изменить роль</button>
+            <button type="button" class="btn btn-danger" onclick="submitBulkForm('/AdminView/BulkDelete')">Удалить</button>
+        </div>
+    </form>
+
+    <div class="pagination">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a href="@Url.Action("UserRed", new { page = i })" class="btn @(i == ViewBag.CurrentPage ? "btn-primary" : "btn-secondary")">@i</a>
         }
-        return true; // Продолжаем отправку формы
+    </div>
+
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
     }
-</script>
-@{
-    var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-    var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
-}
+    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 
-<a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
+    <script>
+        document.getElementById("selectAll").addEventListener("change", function () {
+            var checkboxes = document.querySelectorAll("input[name='selectedUsers']");
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        });
 
+        function submitBulkForm(actionUrl) {
+            var form = document.getElementById("bulkForm");
+            form.action = actionUrl;
+            form.submit();
+        }
+
+        function checkUserId(userId) {
+            if (userId === 16) {
+                alert("Нельзя изменить роль или удалить этого пользователя.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
 </html>
-
