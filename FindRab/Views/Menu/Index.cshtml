@@ -12,37 +12,20 @@
     <link href="~/css/site.css" rel="stylesheet" />
     
 </head>
-<header>
-    <div id="title">FindRab</div>
-    <div class="dropdown">
 
-
-        <a class="dropdown-item" href="/Account/EditProfile">Профиль</a>
-        <a class="dropdown-item" href="/Jobs/UserVacancies">Созданные вакансии</a>
-        <a class="dropdown-item" href="/Jobs/UserResponses">Откликнутые вакансии</a>
-        <a class="dropdown-item" href="/Account/EditProfile">Настройки</a>
-        <div class="dropdown-divider"></div>
-        <form method="post" action="/Account/Logout">
-            <button type="submit" class="dropdown-item">Выйти</button>
-        </form>
-
-    </div>
-</header>
 
 <body>
     
-    <div id="welcome-text">Добро пожаловать на сайт поиска работы!</div>
+    <div class="page-title">Добро пожаловать на сайт поиска работы!</div>
     <div class="button-container">
         <form method="get" action="/Jobs/Index">
-            <button type="submit" class="return-button">Найти резюме</button>
+            <button type="submit" class="return-button">Найти Вакансию</button>
         </form>
         <form method="get" action="/Jobs/Create">
-            <button type="submit" class="create-resume-button">Создать резюме</button>
+            <button type="submit" class="create-resume-button">Создать Вакансию</button>
         </form>
     </div>
-    <footer>
-        <p>&copy; 2024 FindRab. Все права защищены.</p>
-    </footer>
+    
 
     
 </body>

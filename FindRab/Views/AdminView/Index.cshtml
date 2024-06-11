@@ -12,37 +12,51 @@
     <link href="~/css/site.css" rel="stylesheet" />
     
 </head>
+
 <body>
+    @{
+        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        var homeUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+    }
+
     <header>
-        <div id="title">FindRabGodMode</div>
-        <div class="dropdown">
-
-
-            <a class="dropdown-item" href="/Account/EditProfile">Профиль</a>
-            <a class="dropdown-item" href="/Jobs/UserVacancies">Созданные вакансии</a>
-            <a class="dropdown-item" href="/Jobs/UserResponses">Откликнутые вакансии</a>
-            <a class="dropdown-item" href="/Account/EditProfile">Настройки</a>
-            <a class="dropdown-item" href="/AdminView/UserRed">Список пользователей</a>
-            <div class="dropdown-divider"></div>
-            <form method="post" action="/Account/Logout">
-                <button type="submit" class="dropdown-item">Выйти</button>
-            </form>
-
+        <div id="title" onclick="location.href='@homeUrl'">FindRabGodMode</div>
+        <div id="header-menu">
+            <div class="dropdown">
+                <div class="dropdown-toggle">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <div class="dropdown-content">
+                    <a class="dropdown-item" href="/Account/EditProfile">Профиль</a>
+                    <a class="dropdown-item" href="/Jobs/UserVacancies">Созданные вакансии</a>
+                    <a class="dropdown-item" href="/Jobs/UserResponses">Откликнутые вакансии</a>
+                    <a class="dropdown-item" href="/AdminView/UserRed">Список пользователей</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="logout-link">Выйти</a>
+                    <form id="logout-form" method="post" action="/Account/Logout" style="display: none;">
+                    </form>
+                </div>
+            </div>
         </div>
     </header>
-    <div id="welcome-text">Добро пожаловать на сайт поиска работы!</div>
+    <div class="page-title">Добро пожаловать на сайт поиска работы!</div>
     <div class="button-container">
         <form method="get" action="/Jobs/Index">
-            <button type="submit" class="return-button">Найти резюме</button>
+            <button type="submit" class="return-button">Найти Вакансию</button>
         </form>
         <form method="get" action="/Jobs/Create">
-            <button type="submit" class="create-resume-button">Создать резюме</button>
+            <button type="submit" class="create-resume-button">Создать Вакансию</button>
         </form>
     </div>
-    <footer>
-        <p>&copy; 2024 FindRab. Все права защищены.</p>
-    </footer>
-
+   
+    <script>
+        document.getElementById("logout-link").addEventListener("click", function (event) {
+            event.preventDefault();
+            document.getElementById("logout-form").submit();
+        });
+    </script>
 
 </body>
 </html>

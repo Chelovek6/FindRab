@@ -18,6 +18,8 @@ namespace FindRab.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            ViewData["HideHeader"] = true;
+           
             return View();
         }
 
@@ -28,6 +30,7 @@ namespace FindRab.Controllers
             var users = await _context.UserM.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             ViewBag.TotalPages = (int)Math.Ceiling((double)_context.UserM.Count() / pageSize);
             ViewBag.CurrentPage = page;
+            
             return View(users);
         }
 
@@ -47,6 +50,7 @@ namespace FindRab.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
+           
             return RedirectToAction("UserRed");
         }
 
@@ -65,6 +69,7 @@ namespace FindRab.Controllers
                 _context.UserM.Remove(user);
                 await _context.SaveChangesAsync();
             }
+           
             return RedirectToAction("UserRed");
         }
 
@@ -74,6 +79,7 @@ namespace FindRab.Controllers
             if (selectedUsers.Contains(16))
             {
                 TempData["ErrorMessage"] = "Нельзя изменить роль первого пользователя.";
+                
                 return RedirectToAction("UserRed");
             }
 
@@ -83,6 +89,7 @@ namespace FindRab.Controllers
                 user.Role = (user.Role == 1) ? 2 : 1;
             }
             await _context.SaveChangesAsync();
+           
             return RedirectToAction("UserRed");
         }
 
@@ -98,6 +105,7 @@ namespace FindRab.Controllers
             var users = await _context.UserM.Where(u => selectedUsers.Contains(u.UserID)).ToListAsync();
             _context.UserM.RemoveRange(users);
             await _context.SaveChangesAsync();
+            
             return RedirectToAction("UserRed");
         }
     }

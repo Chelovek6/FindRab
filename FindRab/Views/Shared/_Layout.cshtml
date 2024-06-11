@@ -1,10 +1,26 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>ChatWithChatGPT</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Your Company</title>
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    @await Html.PartialAsync("Header")
-    @RenderBody()
+    @if (ViewData["HideHeader"] == null || !(bool)ViewData["HideHeader"])
+    {
+        @Html.Partial("_Header")
+    }
+
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    @if (ViewData["HideFooter"] == null || !(bool)ViewData["HideFooter"])
+    {
+        @Html.Partial("_Footer")
+    }
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

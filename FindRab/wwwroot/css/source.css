@@ -48,31 +48,44 @@ header, footer {
         width: 250px; /* Фиксированная ширина кнопок */
     }
 
-.dropdown-menu {
-    background-color: #ffffff; /* Белый цвет фона */
-    border: none;
-}
-
-    .dropdown-menu a {
-        color: #ff6666; /* Красный цвет текста */
-    }
-
-footer {
+.page-title {
     text-align: center;
-    margin-top: auto; /* Для фиксации footer внизу */
+    color: #ff6666; /* Красный цвет текста */
+    margin: 20px 0;
 }
 
-.dropdown-toggle::after {
-    border-top: .3em solid;
-    border-right: .3em solid transparent;
-    border-bottom: 0;
-    border-left: .3em solid transparent;
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.search-box {
+    width: 50%;
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #ff6666;
+    border-radius: 5px;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    z-index: 1000;
+    display: none;
 }
 
 .vacancy-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     gap: 20px;
     padding: 20px;
 }
@@ -83,8 +96,18 @@ footer {
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    width: 300px;
+    width: 80% !important; /* Увеличиваем ширину карточки до 80% */
+    max-width: 800px !important; /* Устанавливаем максимальную ширину */
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
+
+    .vacancy-card:hover {
+        transform: scale(1.05);
+    }
 
     .vacancy-card h2 {
         margin-top: 0;

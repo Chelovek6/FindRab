@@ -26,6 +26,8 @@ namespace FindRab.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            ViewData["HideHeader"] = true;
+            ViewData["HideFooter"] = true;
             return View();
         }
 
@@ -50,7 +52,7 @@ namespace FindRab.Controllers
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
+                   
                     return RedirectToAction("Index", user.Role == 1 ? "AdminView" : "Menu");
                 }
 
@@ -64,6 +66,8 @@ namespace FindRab.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewData["HideHeader"] = true;
+            ViewData["HideFooter"] = true;
             return View();
         }
 
@@ -78,6 +82,8 @@ namespace FindRab.Controllers
                 if (userExists)
                 {
                     ModelState.AddModelError("Username", "Имя пользователя уже занято");
+                    ViewData["HideHeader"] = true;
+                    ViewData["HideFooter"] = true;
                     return View(model);
                 }
 
@@ -92,13 +98,14 @@ namespace FindRab.Controllers
                 await _context.SaveChangesAsync();
 
                 await Authenticate(user.Username);
-
+               
                 return RedirectToAction("Index", "Menu");
             }
-
+            ViewData["HideHeader"] = true;
+            ViewData["HideFooter"] = true;
             return View(model);
         }
-
+        // /////////////////////////////////////////////////////////
         // GET: /Account/EditProfile
         [HttpGet]
         public async Task<IActionResult> EditProfile()
@@ -151,11 +158,35 @@ namespace FindRab.Controllers
                 _context.Update(user);
                 await _context.SaveChangesAsync();
 
+                // Обновление аутентификационного билета
+                await SignInUser(user);
+
                 return RedirectToAction("Index", user.Role == 1 ? "AdminView" : "Menu");
             }
 
             return View(model);
         }
+
+        private async Task SignInUser(User user)
+        {
+            // Создание нового списка утверждений (claims)
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role.ToString())
+    };
+
+            // Создание объекта ClaimsIdentity
+            var claimsIdentity = new ClaimsIdentity(claims, "Login");
+
+            // Создание объекта ClaimsPrincipal
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            // Вход пользователя с помощью аутентификационного менеджера
+            await HttpContext.SignInAsync(claimsPrincipal);
+        }
+
+        // //////////////////////////////////////////////////////////////////////////////////
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -175,6 +206,7 @@ namespace FindRab.Controllers
         // GET: /Account/RegistrationSuccess
         public IActionResult RegistrationSuccess()
         {
+            
             return View("~/Views/Menu/Index.cshtml");
         }
     }

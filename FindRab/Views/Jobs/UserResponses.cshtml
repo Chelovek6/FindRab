@@ -1,0 +1,39 @@
+﻿@model IEnumerable<FindRab.ViewModels.VacancyViewModel>
+
+@{
+    ViewData["Title"] = "My Responses";
+}
+
+<h1>My Responses</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Education</th>
+            <th>Salary</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>@Html.DisplayFor(modelItem => item.Education)</td>
+                <td>@Html.DisplayFor(modelItem => item.Salary)</td>
+                <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-primary">Детали</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<link href="~/css/source.css" rel="stylesheet" />

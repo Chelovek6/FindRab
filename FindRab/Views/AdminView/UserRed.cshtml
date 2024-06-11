@@ -71,11 +71,7 @@
         }
     </div>
 
-    @{
-        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
-    }
-    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
+   
 
     <script>
         document.getElementById("selectAll").addEventListener("change", function () {

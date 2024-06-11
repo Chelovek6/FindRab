@@ -4,43 +4,61 @@
     ViewData["Title"] = "My Vacancies";
 }
 
-<h1>My Vacancies</h1>
+<h1 class="page-title">My Vacancies</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Education</th>
-            <th>Salary</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                <td>@Html.DisplayFor(modelItem => item.Education)</td>
-                <td>@Html.DisplayFor(modelItem => item.Salary)</td>
-                <td>@Html.DisplayFor(modelItem => item.Phone)</td>
-                <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.VacancyId" class="btn btn-primary">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<div>
-    @{
-        var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-        var returnUrl = userRole == "1" ? Url.Action("Index", "AdminView") : Url.Action("Index", "Menu");
+<div class="vacancy-list">
+    @foreach (var item in Model)
+    {
+        <div class="vacancy-card">
+            <h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+            <p><strong>Description:</strong> @Html.DisplayFor(modelItem => item.Description)</p>
+            <p><strong>Education:</strong> @Html.DisplayFor(modelItem => item.Education)</p>
+            <p><strong>Salary:</strong> @Html.DisplayFor(modelItem => item.Salary)</p>
+            <p><strong>Phone:</strong> @Html.DisplayFor(modelItem => item.Phone)</p>
+            <p><strong>Email:</strong> @Html.DisplayFor(modelItem => item.Email)</p>
+            <div class="button-container">
+                <a asp-action="Edit" asp-route-id="@item.VacancyId" class="btn">Edit</a>
+                <button class="btn btn-danger" onclick="confirmDelete('@item.VacancyId')">Удалить</button>
+            </div>
+        </div>
     }
-
-    <a href="@returnUrl" class="btn btn-secondary">Return to Home</a>
 </div>
-<link href="~/css/source.css" rel="stylesheet" />
+
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Вы уверенны?</h2>
+        <p>Вы не сможете восстановить вакансию.</p>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal()">Нет</button>
+            <button class="btn btn-danger" id="confirmDeleteButton">Да</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        var vacancyIdToDelete = null;
+
+        function confirmDelete(vacancyId) {
+            vacancyIdToDelete = vacancyId;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            vacancyIdToDelete = null;
+        }
+
+        document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+            if (vacancyIdToDelete !== null) {
+                window.location.href = '/Jobs/Delete/' + vacancyIdToDelete;
+            }
+        });
+    </script>
+}
+
+<link href="~/css/VacList.css" rel="stylesheet" />

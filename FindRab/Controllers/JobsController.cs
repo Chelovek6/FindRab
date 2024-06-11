@@ -36,7 +36,7 @@ namespace FindRab.Controllers
                 Phone = v.Phone,
                 Email = v.Email
             }).ToList();
-
+            
             return View(model);
         }
 
@@ -72,6 +72,7 @@ namespace FindRab.Controllers
         // GET: Jobs/Create
         public IActionResult Create()
         {
+            
             return View();
         }
 
@@ -263,7 +264,7 @@ namespace FindRab.Controllers
 
             return View(viewModel);
         }
-
+        // //////////////////////////////////////////////////////////////////////////////////////
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Apply(int vacancyId)
@@ -298,13 +299,18 @@ namespace FindRab.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return RedirectToAction("Details", new { id = vacancyId });
+                // Возвращаем количество откликов для обновления на клиенте
+                var applicationCount = await _context.JobApplicationsM.CountAsync(a => a.VacancyId == vacancyId);
+
+                return Ok(new { applicationCount });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error");
             }
         }
+
+
         // //////////////////////////////////////////////////////////////////
         // Метод для получения ID текущего пользователя
         [ValidateAntiForgeryToken]
@@ -349,10 +355,68 @@ namespace FindRab.Controllers
 
             return View(model);
         }
+        // //////////////////////////////////////////////////////////
 
+        [HttpGet]
+        public async Task<IActionResult> Search(string term)
+        {
+            var vacancies = await _context.VacanciesM
+                .Where(v => v.Title.Contains(term))
+                .Select(v => new
+                {
+                    vacancyId = v.VacancyId,
+                    title = v.Title
+                })
+                .ToListAsync();
 
+            return Json(vacancies);
+        }
 
+        // ////////////////////////////////////////////////////////////////////////
+        public async Task<IActionResult> UserResponses()
+        {
+            var currentUser = User.Identity.Name;
+            var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
+            var userResponses = await _context.JobApplicationsM
+                .Where(j => j.UserId == user.UserID)
+                .Join(
+                    _context.VacanciesM,
+                    application => application.VacancyId,
+                    vacancy => vacancy.VacancyId,
+                    (application, vacancy) => new VacancyViewModel
+                    {
+                        VacancyId = vacancy.VacancyId,
+                        Title = vacancy.Title,
+                        Description = vacancy.Description,
+                        Education = vacancy.Education,
+                        Salary = vacancy.Salary,
+                        Phone = vacancy.Phone,
+                        Email = vacancy.Email
+                    })
+                .ToListAsync();
+
+            return View(userResponses);
+        }
+        // ////////////////////////////////////////////////////////////////////////////////////////////
+        public async Task<IActionResult> Delete(int id)
+        {
+            var vacancy = await _context.VacanciesM.FindAsync(id);
+            if (vacancy == null)
+            {
+                return NotFound();
+            }
+
+            _context.VacanciesM.Remove(vacancy);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(UserVacancies));
+        }
+        // //////////////////////////////////////
 
 
 

@@ -1,6 +1,6 @@
-/* Стили для всего сайта */
+п»ї/* РЎС‚РёР»Рё РґР»СЏ РІСЃРµРіРѕ СЃР°Р№С‚Р° */
 body {
-    background-color: #ffffff; /* Белый цвет фона */
+    background-color: #ffffff; /* Р‘РµР»С‹Р№ С†РІРµС‚ С„РѕРЅР° */
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -10,7 +10,7 @@ body {
 }
 
 header, footer {
-    background-color: #ff6666; /* Красный цвет */
+    background-color: #ff6666; /* РљСЂР°СЃРЅС‹Р№ С†РІРµС‚ */
     color: white;
     padding: 10px 20px;
     display: flex;
@@ -19,10 +19,10 @@ header, footer {
 }
 
 #title {
-    font-size: 24px; /* Уменьшенный размер шрифта */
+    font-size: 24px; /* РЈРјРµРЅСЊС€РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р° */
     font-weight: bold;
     margin: 0;
-    cursor: pointer; /* Курсор указывает, что это ссылка */
+    cursor: pointer; /* РљСѓСЂСЃРѕСЂ СѓРєР°Р·С‹РІР°РµС‚, С‡С‚Рѕ СЌС‚Рѕ СЃСЃС‹Р»РєР° */
 }
 
 #header-menu {
@@ -38,7 +38,7 @@ header, footer {
     #header-menu .dropdown-content {
         display: none;
         position: absolute;
-        left: -140px; /* Изменено для корректного позиционирования */
+        left: -140px; /* РР·РјРµРЅРµРЅРѕ РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ РїРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ */
         background-color: #ffffff;
         min-width: 160px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -73,12 +73,12 @@ header, footer {
             background-color: white;
         }
 
-/* Footer всегда внизу */
+/* Footer РІСЃРµРіРґР° РІРЅРёР·Сѓ */
 footer {
     text-align: center;
     margin-top: auto;
-    width: 100%; /* На всю ширину */
-    padding: 10px 0; /* Уменьшена высота */
+    width: 100%; /* РќР° РІСЃСЋ С€РёСЂРёРЅСѓ */
+    padding: 10px 0; /* РЈРјРµРЅСЊС€РµРЅР° РІС‹СЃРѕС‚Р° */
 }
 
 .vacancy-list {
@@ -118,6 +118,49 @@ footer {
     text-align: center;
 }
 
+.modal {
+    display: none; /* РЎРєСЂС‹РІР°РµРј РјРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Р—Р°С‚РµРјРЅСЏСЋС‰РёР№ С„РѕРЅ */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px; /* РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР° РѕРєРЅР° */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
 .pagination {
     display: flex;
     justify-content: center;
@@ -132,6 +175,7 @@ footer {
     background-color: #ff6666;
     color: #ffffff;
 }
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -145,14 +189,14 @@ footer {
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        background-color: #ff6666; /* Красный цвет кнопок */
-        color: #ffffff; /* Белый цвет текста */
-        width: 250px; /* Фиксированная ширина кнопок */
+        background-color: #ff6666; /* РљСЂР°СЃРЅС‹Р№ С†РІРµС‚ РєРЅРѕРїРѕРє */
+        color: #ffffff; /* Р‘РµР»С‹Р№ С†РІРµС‚ С‚РµРєСЃС‚Р° */
+        width: 250px; /* Р¤РёРєСЃРёСЂРѕРІР°РЅРЅР°СЏ С€РёСЂРёРЅР° РєРЅРѕРїРѕРє */
     }
 
 .page-title {
     text-align: center;
-    color: #ff6666; /* Красный цвет текста */
+    color: #ff6666; /* РљСЂР°СЃРЅС‹Р№ С†РІРµС‚ С‚РµРєСЃС‚Р° */
     margin: 20px 0;
     font-size: 24px;
 }
