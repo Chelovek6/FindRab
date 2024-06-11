@@ -58,7 +58,8 @@ namespace FindRab.Controllers
 
                 ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
             }
-
+            ViewData["HideHeader"] = true;
+            ViewData["HideFooter"] = true;
             return View(model);
         }
 

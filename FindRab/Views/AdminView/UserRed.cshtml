@@ -9,6 +9,14 @@
 </head>
 <body>
     <h2>Список пользователей</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <form id="bulkForm" method="post">
         <table class="table">
             <thead>
@@ -71,8 +79,6 @@
         }
     </div>
 
-   
-
     <script>
         document.getElementById("selectAll").addEventListener("change", function () {
             var checkboxes = document.querySelectorAll("input[name='selectedUsers']");
@@ -87,13 +93,7 @@
             form.submit();
         }
 
-        function checkUserId(userId) {
-            if (userId === 16) {
-                alert("Нельзя изменить роль или удалить этого пользователя.");
-                return false;
-            }
-            return true;
-        }
+        
     </script>
 </body>
 </html>

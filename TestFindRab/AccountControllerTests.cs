@@ -1,17 +1,11 @@
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using FindRab.Controllers;
 using FindRab.DataContext;
 using FindRab.models;
-using FindRab.Models;
 using FindRab.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
+using System.Security.Claims;
 using Xunit;
 
 public class AccountControllerTests
@@ -74,7 +68,10 @@ public class AccountControllerTests
         var model = new RegisterViewModel
         {
             Username = "TestUser",
-            Password = "Password123"
+            Password = "Password123",
+            ConfirmPassword = "Password123",
+            RoleCode = 2,
+            UserID = 1
         };
 
         using (var context = new BDContext(_contextOptions))
@@ -102,7 +99,10 @@ public class AccountControllerTests
         var model = new RegisterViewModel
         {
             Username = "NewUser",
-            Password = "Password123"
+            Password = "Password123",
+            ConfirmPassword = "Password123",
+            RoleCode = 2,
+            AccountCode = 1
         };
 
         var controller = CreateController();

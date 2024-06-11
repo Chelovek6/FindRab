@@ -4,8 +4,10 @@ namespace FindRab.ViewModels
 {
     public class RegisterViewModel
     {
+        public int UserID { get; set; }
+
         [Required(ErrorMessage = "Имя пользователя обязательно")]
-        [StringLength(50, ErrorMessage = "Имя пользователя не должно превышать 50 символов")]
+        [StringLength(20, ErrorMessage = "Имя пользователя не должно превышать 20 символов")]
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Пароль обязателен")]

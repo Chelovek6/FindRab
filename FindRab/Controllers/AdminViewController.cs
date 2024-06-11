@@ -3,9 +3,11 @@ using FindRab.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FindRab.Controllers
 {
+    [Authorize]
     public class AdminViewController : Controller
     {
         private readonly BDContext _context;
@@ -19,7 +21,6 @@ namespace FindRab.Controllers
         public IActionResult Index()
         {
             ViewData["HideHeader"] = true;
-           
             return View();
         }
 
@@ -30,16 +31,16 @@ namespace FindRab.Controllers
             var users = await _context.UserM.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             ViewBag.TotalPages = (int)Math.Ceiling((double)_context.UserM.Count() / pageSize);
             ViewBag.CurrentPage = page;
-            
             return View(users);
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangeRole(int userId)
         {
-            if (userId == 16)
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (userId == 16 || userId == currentUserId)
             {
-                TempData["ErrorMessage"] = "Нельзя изменить роль первого пользователя.";
+                TempData["ErrorMessage"] = "Нельзя изменить роль этого пользователя.";
             }
             else
             {
@@ -50,36 +51,36 @@ namespace FindRab.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-           
             return RedirectToAction("UserRed");
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int userId)
         {
-            if (userId == 16)
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (userId == 16 || userId == currentUserId)
             {
-                TempData["ErrorMessage"] = "Нельзя удалить первого пользователя.";
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = "Нельзя удалить этого пользователя.";
             }
-
-            var user = await _context.UserM.FindAsync(userId);
-            if (user != null)
+            else
             {
-                _context.UserM.Remove(user);
-                await _context.SaveChangesAsync();
+                var user = await _context.UserM.FindAsync(userId);
+                if (user != null)
+                {
+                    _context.UserM.Remove(user);
+                    await _context.SaveChangesAsync();
+                }
             }
-           
             return RedirectToAction("UserRed");
         }
 
         [HttpPost]
         public async Task<IActionResult> BulkChangeRole(int[] selectedUsers)
         {
-            if (selectedUsers.Contains(16))
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (selectedUsers.Contains(16) || selectedUsers.Contains(currentUserId))
             {
-                TempData["ErrorMessage"] = "Нельзя изменить роль первого пользователя.";
-                
+                TempData["ErrorMessage"] = "Нельзя изменить роль одного из выбранных пользователей.";
                 return RedirectToAction("UserRed");
             }
 
@@ -89,23 +90,22 @@ namespace FindRab.Controllers
                 user.Role = (user.Role == 1) ? 2 : 1;
             }
             await _context.SaveChangesAsync();
-           
             return RedirectToAction("UserRed");
         }
 
         [HttpPost]
         public async Task<IActionResult> BulkDelete(int[] selectedUsers)
         {
-            if (selectedUsers.Contains(16))
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (selectedUsers.Contains(16) || selectedUsers.Contains(currentUserId))
             {
-                TempData["ErrorMessage"] = "Нельзя удалить первого пользователя.";
+                TempData["ErrorMessage"] = "Нельзя удалить одного из выбранных пользователей.";
                 return RedirectToAction("UserRed");
             }
 
             var users = await _context.UserM.Where(u => selectedUsers.Contains(u.UserID)).ToListAsync();
             _context.UserM.RemoveRange(users);
             await _context.SaveChangesAsync();
-            
             return RedirectToAction("UserRed");
         }
     }

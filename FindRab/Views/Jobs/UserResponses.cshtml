@@ -30,6 +30,10 @@
                 <td>@Html.DisplayFor(modelItem => item.Email)</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.VacancyId" class="btn btn-primary">Детали</a>
+                    <form asp-action="Unapply" method="post" class="d-inline">
+                        <input type="hidden" name="vacancyId" value="@item.VacancyId" />
+                        <button type="submit" class="btn btn-danger">От/откликнуться</button>
+                    </form>
                 </td>
             </tr>
         }

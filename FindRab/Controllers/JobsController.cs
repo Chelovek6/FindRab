@@ -40,36 +40,7 @@ namespace FindRab.Controllers
             return View(model);
         }
 
-        // GET: Jobs/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var vacancy = await _context.VacanciesM.FirstOrDefaultAsync(v => v.VacancyId == id);
-        //    if (vacancy == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var model = new VacancyViewModel
-        //    {
-        //        VacancyId = vacancy.VacancyId,
-        //        Title = vacancy.Title,
-        //        Description = vacancy.Description,
-        //        Education = vacancy.Education,
-        //        Salary = vacancy.Salary,
-        //        UserId = vacancy.UserId,
-        //        Phone = vacancy.Phone,
-        //        Email = vacancy.Email
-        //    };
-
-        //    return View(model);
-        //}
-
-        // GET: Jobs/Create
+        
         public IActionResult Create()
         {
             
@@ -417,6 +388,37 @@ namespace FindRab.Controllers
             return RedirectToAction(nameof(UserVacancies));
         }
         // //////////////////////////////////////
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unapply(int vacancyId)
+        {
+            try
+            {
+                var currentUser = User.Identity.Name;
+                var user = await _context.UserM.FirstOrDefaultAsync(u => u.Username == currentUser);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                var application = await _context.JobApplicationsM
+                    .FirstOrDefaultAsync(a => a.UserId == user.UserID && a.VacancyId == vacancyId);
+
+                if (application != null)
+                {
+                    _context.JobApplicationsM.Remove(application);
+                    await _context.SaveChangesAsync();
+                }
+
+                return RedirectToAction(nameof(UserResponses));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
 
