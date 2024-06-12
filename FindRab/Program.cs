@@ -66,4 +66,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Menu}/{action=Index}/{id?}");
 
+// Инициализация базы данных
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BDContext>();
+    DbInitializer.Initialize(context);
+}
+
 app.Run();

@@ -37,7 +37,7 @@
     $(document).ready(function () {
         $('#searchBox').on('input', function () {
             var query = $(this).val();
-            if (query.length >= 3) {
+            if (query.length >= 1) {
                 $.ajax({
                     url: '@Url.Action("Search", "Jobs")',
                     type: 'GET',
@@ -45,7 +45,7 @@
                     success: function (data) {
                         $('#searchResults').empty();
                         data.forEach(function (item) {
-                            $('#searchResults').append('<a href="@Url.Action("Details", "Jobs")/' + item.vacancyId + '" class="list-group-item list-group-item-action">' + item.title + '</a>');
+                            $('#searchResults').append('<a href="@Url.Action("Details", "Jobs")/' + item.vacancyId + '" class="list-group-item list-group-item-action">' + item.title + ' </a>');
                         });
                         $('#searchResults').show();
                     }

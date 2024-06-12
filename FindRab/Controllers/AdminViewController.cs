@@ -38,7 +38,7 @@ namespace FindRab.Controllers
         public async Task<IActionResult> ChangeRole(int userId)
         {
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (userId == 16 || userId == currentUserId)
+            if (userId == 1 || userId == currentUserId)
             {
                 TempData["ErrorMessage"] = "Нельзя изменить роль этого пользователя.";
             }
@@ -58,7 +58,7 @@ namespace FindRab.Controllers
         public async Task<IActionResult> Delete(int userId)
         {
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (userId == 16 || userId == currentUserId)
+            if (userId == 1 || userId == currentUserId)
             {
                 TempData["ErrorMessage"] = "Нельзя удалить этого пользователя.";
             }
@@ -78,7 +78,7 @@ namespace FindRab.Controllers
         public async Task<IActionResult> BulkChangeRole(int[] selectedUsers)
         {
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (selectedUsers.Contains(16) || selectedUsers.Contains(currentUserId))
+            if (selectedUsers.Contains(1) || selectedUsers.Contains(currentUserId))
             {
                 TempData["ErrorMessage"] = "Нельзя изменить роль одного из выбранных пользователей.";
                 return RedirectToAction("UserRed");
@@ -97,7 +97,7 @@ namespace FindRab.Controllers
         public async Task<IActionResult> BulkDelete(int[] selectedUsers)
         {
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (selectedUsers.Contains(16) || selectedUsers.Contains(currentUserId))
+            if (selectedUsers.Contains(1) || selectedUsers.Contains(currentUserId))
             {
                 TempData["ErrorMessage"] = "Нельзя удалить одного из выбранных пользователей.";
                 return RedirectToAction("UserRed");

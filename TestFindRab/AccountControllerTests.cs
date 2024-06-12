@@ -70,8 +70,8 @@ public class AccountControllerTests
             Username = "TestUser",
             Password = "Password123",
             ConfirmPassword = "Password123",
-            RoleCode = 2,
-            UserID = 1
+            RoleCode = 2
+            
         };
 
         using (var context = new BDContext(_contextOptions))
