@@ -20,7 +20,7 @@ namespace FindRab.DataContext
 
         public BDContext(DbContextOptions<BDContext> options) : base(options)
         {
-            
+            Database.EnsureCreated();
         }
         
 
